@@ -1,4 +1,3 @@
-// vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -24,12 +23,12 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-  root: path.resolve(import.meta.dirname, "client"),
+  root: path.resolve(import.meta.dirname, "client"), // Your client source code root
   build: {
-    // *** CHANGE THIS LINE ***
+    // --- IMPORTANT CHANGE HERE ---
     // Output directly to a 'build' folder at the project root
-    outDir: path.resolve(import.meta.dirname, "build"), // This will be my-project/build/
+    outDir: path.resolve(import.meta.dirname, "build"), // This will resolve to my-project/build/
     emptyOutDir: true,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1000, // Adjusted chunk size warning limit
   },
 });
