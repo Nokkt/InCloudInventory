@@ -254,18 +254,6 @@ class MemStorage {
     return this.stockTransactions.get(id);
   }
 
-  async createStockTransaction(transaction) {
-    const id = this.currentTransactionId++;
-    const now = new Date();
-    const newTransaction = { 
-      ...transaction, 
-      id, 
-      timestamp: now,
-      status: transaction.status || "completed",
-      reason: transaction.reason || null,
-      batchNumber: transaction.batchNumber || null,
-      expiryDate: transaction.expiryDate || null
-    };
     this.stockTransactions.set(id, newTransaction);
     return newTransaction;
   }
