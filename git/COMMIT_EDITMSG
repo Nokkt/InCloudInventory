@@ -1,0 +1,7 @@
+Enable password resets by sending a verification code to user's email
+
+Implements password reset functionality via email using Nodemailer and adds email service.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 91156274-9a22-41f8-86c6-870844bef084
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/742f306c-c249-4f56-a755-c8322b3770d1/bb684f47-9cb5-4ed9-b39d-8e3f354f9cb8.jpg
