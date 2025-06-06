@@ -17,12 +17,7 @@ import {
 
 
 export function Header(
-  { 
-  title, 
-  description, 
-  showSearch = true,
-  onSearch
-   }= useAuth();
+  { title, description, showSearch = true, onSearch }= useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (e: React.ChangeEvent) => {
