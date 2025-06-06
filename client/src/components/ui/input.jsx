@@ -1,12 +1,15 @@
+import React from 'react';
 import "@/lib/utils";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      
-    )
-  }
-)
-Input.displayName = "Input"
+const Input = React.forwardRef(({ className, type, ...props }, ref) => {
+  return (
+    <input
+      type={type}
+      className={className}
+      ref={ref}
+      {...props}
+    />
+  );
+});
 
-export { Input }
+export default {Input};
