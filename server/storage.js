@@ -24,7 +24,7 @@ class MemStorage {
     this.orderItems = new Map();
     this.customers = new Map();
     this.passwordResetTokens = new Map();
-    
+
     this.currentUserId = 1;
     this.currentProductId = 1;
     this.currentCategoryId = 1;
@@ -34,11 +34,11 @@ class MemStorage {
     this.currentOrderItemId = 1;
     this.currentCustomerId = 1;
     this.currentTokenId = 1;
-    
+
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
     });
-    
+
     this.initializeData();
   }
 
@@ -121,7 +121,7 @@ class MemStorage {
       {
         id: 2,
         productId: 2, // Milk
-        batchNumber: "INIT-002", 
+        batchNumber: "INIT-002",
         quantity: 75,
         remainingQuantity: 75,
         expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
@@ -152,8 +152,8 @@ class MemStorage {
 
   async createUser(insertUser) {
     const id = this.currentUserId++;
-    const user = { 
-      ...insertUser, 
+    const user = {
+      ...insertUser,
       id,
       role: insertUser.role || "User",
       profileImageUrl: insertUser.profileImageUrl || null
@@ -182,7 +182,7 @@ class MemStorage {
   async getAllProducts() {
     const products = Array.from(this.products.values());
     console.log('getAllProducts() returning:', products.map(p => ({ id: p.id, name: p.name, currentStock: p.currentStock })));
-    
+
     // Additional verification - check if any products have inconsistent stock vs batches
     for (const product of products) {
       const batches = await this.getInventoryBatchesByProduct(product.id);
@@ -191,7 +191,7 @@ class MemStorage {
         console.log(`INCONSISTENCY DETECTED: Product ${product.id} currentStock=${product.currentStock} but batch total=${batchTotal}`);
       }
     }
-    
+
     return products;
   }
 
@@ -202,9 +202,9 @@ class MemStorage {
   async createProduct(product) {
     const id = this.currentProductId++;
     const now = new Date();
-    const newProduct = { 
-      ...product, 
-      id, 
+    const newProduct = {
+      ...product,
+      id,
       createdAt: now,
       description: product.description || null,
       minStockLevel: product.minStockLevel || 10,
@@ -236,8 +236,8 @@ class MemStorage {
 
   async createCategory(category) {
     const id = this.currentCategoryId++;
-    const newCategory = { 
-      ...category, 
+    const newCategory = {
+      ...category,
       id,
       description: category.description || null
     };
@@ -245,7 +245,7 @@ class MemStorage {
     return newCategory;
   }
 
-  // Stock transaction methods
+  // Stock transaction methods (Keep this one, remove the duplicate above)
   async getAllStockTransactions() {
     return Array.from(this.stockTransactions.values());
   }
@@ -254,7 +254,6 @@ class MemStorage {
     return this.stockTransactions.get(id);
   }
 
-    
   async updateStockTransaction(id, update) {
     const transaction = this.stockTransactions.get(id);
     if (!transaction) return undefined;
@@ -282,15 +281,15 @@ class MemStorage {
   async createOrder(order, items) {
     const id = this.currentOrderId++;
     const now = new Date();
-    const newOrder = { 
-      ...order, 
-      id, 
+    const newOrder = {
+      ...order,
+      id,
       orderDate: now,
       status: order.status || "pending",
       customerId: order.customerId || null,
       notes: order.notes || null
     };
-    
+
     // Create order items
     const orderItems = [];
     for (const item of items) {
@@ -299,7 +298,7 @@ class MemStorage {
       this.orderItems.set(orderItemId, newOrderItem);
       orderItems.push(newOrderItem);
     }
-    
+
     newOrder.orderItems = orderItems;
     this.orders.set(id, newOrder);
     return newOrder;
@@ -311,7 +310,7 @@ class MemStorage {
   }
 
   async getLowStockItems() {
-    return Array.from(this.products.values()).filter(product => 
+    return Array.from(this.products.values()).filter(product =>
       product.currentStock <= 50
     );
   }
@@ -319,7 +318,7 @@ class MemStorage {
   async getExpiringProducts() {
     const oneMonthFromNow = new Date();
     oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-    
+
     return Array.from(this.products.values())
       .filter(product => {
         if (!product.shelfLife) return false;
@@ -342,7 +341,7 @@ class MemStorage {
     const transactions = Array.from(this.stockTransactions.values())
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
       .slice(0, 5);
-    
+
     return transactions.map(transaction => {
       const product = this.products.get(transaction.productId);
       return {
@@ -376,9 +375,9 @@ class MemStorage {
   async createInventoryBatch(batch) {
     const id = this.currentBatchId++;
     const now = new Date();
-    const newBatch = { 
-      ...batch, 
-      id, 
+    const newBatch = {
+      ...batch,
+      id,
       createdAt: now,
       remainingQuantity: batch.quantity
     };
@@ -389,7 +388,7 @@ class MemStorage {
   async updateInventoryBatch(id, batchUpdate) {
     const existingBatch = this.inventoryBatches.get(id);
     if (!existingBatch) return undefined;
-    
+
     const updatedBatch = { ...existingBatch, ...batchUpdate };
     this.inventoryBatches.set(id, updatedBatch);
     return updatedBatch;
@@ -399,12 +398,12 @@ class MemStorage {
   async createStockTransaction(transaction) {
     const id = this.currentTransactionId++;
     const now = new Date();
-    
+
     if (transaction.type === 'in') {
       // For stock-in, create a new batch
       const product = this.products.get(transaction.productId);
       if (!product) throw new Error('Product not found');
-      
+
       let expiryDate = null;
       if (product.isFoodProduct && product.shelfLife) {
         expiryDate = new Date(now);
@@ -413,10 +412,10 @@ class MemStorage {
       if (transaction.expiryDate) {
         expiryDate = new Date(transaction.expiryDate);
       }
-      
+
       // Generate batch number if not provided
       const batchNumber = transaction.batchNumber || `B${id}-${Date.now()}`;
-      
+
       // Create inventory batch
       const batch = await this.createInventoryBatch({
         productId: transaction.productId,
@@ -425,26 +424,26 @@ class MemStorage {
         expiryDate,
         userId: transaction.userId
       });
-      
+
       // Update product stock based on actual batch quantities
       const allBatches = await this.getInventoryBatchesByProduct(transaction.productId);
       const totalBatchStock = allBatches.reduce((sum, batch) => sum + batch.remainingQuantity, 0);
       console.log(`BEFORE UPDATE - Product ${transaction.productId} currentStock: ${product.currentStock}`);
       console.log(`- All batches:`, allBatches.map(b => ({ id: b.id, remaining: b.remainingQuantity })));
       console.log(`- Total batch stock calculated: ${totalBatchStock}`);
-      
+
       product.currentStock = totalBatchStock;
       this.products.set(transaction.productId, product);
-      
+
       // Verify the update
       const verifyProduct = this.products.get(transaction.productId);
       console.log(`AFTER UPDATE - Product ${transaction.productId} currentStock: ${verifyProduct.currentStock}`);
       console.log(`STOCK UPDATE TRACE: Setting product ${transaction.productId} stock to ${totalBatchStock} in createStockTransaction`);
-      
+
       // Create transaction record
-      const newTransaction = { 
-        ...transaction, 
-        id, 
+      const newTransaction = {
+        ...transaction,
+        id,
         timestamp: now,
         batchId: batch.id,
         batchNumber,
@@ -452,42 +451,42 @@ class MemStorage {
       };
       this.stockTransactions.set(id, newTransaction);
       return newTransaction;
-      
+
     } else if (transaction.type === 'out') {
       // For stock-out, use FIFO from existing batches or target specific batch
       const product = this.products.get(transaction.productId);
       if (!product) throw new Error('Product not found');
-      
+
       const availableBatches = await this.getInventoryBatchesByProduct(transaction.productId);
       const activeBatches = availableBatches.filter(batch => batch.remainingQuantity > 0);
-      
+
       if (activeBatches.length === 0) {
         throw new Error('No stock available for this product');
       }
-      
+
       let remainingQuantityToDeduct = transaction.quantity;
       const transactionsCreated = [];
-      
+
       // If specific batch ID is provided, target that batch only
       if (transaction.batchId) {
         const targetBatch = activeBatches.find(batch => batch.id === transaction.batchId);
         if (!targetBatch) {
           throw new Error('Specified batch not found or has no remaining stock');
         }
-        
+
         if (remainingQuantityToDeduct > targetBatch.remainingQuantity) {
           throw new Error(`Insufficient stock in batch. Available: ${targetBatch.remainingQuantity}, Requested: ${remainingQuantityToDeduct}`);
         }
-        
+
         // Update batch remaining quantity
         targetBatch.remainingQuantity -= remainingQuantityToDeduct;
         await this.updateInventoryBatch(targetBatch.id, { remainingQuantity: targetBatch.remainingQuantity });
-        
+
         // Create transaction record for this specific batch
         const transactionId = this.currentTransactionId++;
-        const newTransaction = { 
-          ...transaction, 
-          id: transactionId, 
+        const newTransaction = {
+          ...transaction,
+          id: transactionId,
           timestamp: now,
           quantity: remainingQuantityToDeduct,
           batchId: targetBatch.id,
@@ -496,38 +495,38 @@ class MemStorage {
         };
         this.stockTransactions.set(transactionId, newTransaction);
         transactionsCreated.push(newTransaction);
-        
+
         // Update product stock based on actual batch quantities
         const updatedBatches = await this.getInventoryBatchesByProduct(transaction.productId);
         const totalBatchStock = updatedBatches.reduce((sum, batch) => sum + batch.remainingQuantity, 0);
         product.currentStock = totalBatchStock;
         this.products.set(transaction.productId, product);
-        
+
         return newTransaction;
       }
-      
+
       // Otherwise, use FIFO from existing batches
       const totalAvailable = activeBatches.reduce((sum, batch) => sum + batch.remainingQuantity, 0);
-      
+
       if (remainingQuantityToDeduct > totalAvailable) {
         throw new Error(`Insufficient stock. Available: ${totalAvailable}, Requested: ${remainingQuantityToDeduct}`);
       }
-      
+
       // Deduct from batches using FIFO (earliest expiry first)
       for (const batch of activeBatches) {
         if (remainingQuantityToDeduct <= 0) break;
-        
+
         const quantityFromThisBatch = Math.min(remainingQuantityToDeduct, batch.remainingQuantity);
-        
+
         // Update batch remaining quantity
         batch.remainingQuantity -= quantityFromThisBatch;
         await this.updateInventoryBatch(batch.id, { remainingQuantity: batch.remainingQuantity });
-        
+
         // Create transaction record for this batch
         const transactionId = this.currentTransactionId++;
-        const newTransaction = { 
-          ...transaction, 
-          id: transactionId, 
+        const newTransaction = {
+          ...transaction,
+          id: transactionId,
           timestamp: now,
           quantity: quantityFromThisBatch,
           batchId: batch.id,
@@ -536,20 +535,20 @@ class MemStorage {
         };
         this.stockTransactions.set(transactionId, newTransaction);
         transactionsCreated.push(newTransaction);
-        
+
         remainingQuantityToDeduct -= quantityFromThisBatch;
       }
-      
+
       // Update product stock based on actual batch quantities
       const updatedBatches = await this.getInventoryBatchesByProduct(transaction.productId);
       const totalBatchStock = updatedBatches.reduce((sum, batch) => sum + batch.remainingQuantity, 0);
       product.currentStock = totalBatchStock;
       this.products.set(transaction.productId, product);
-      
+
       // Return the primary transaction (first one created)
       return transactionsCreated[0];
     }
-    
+
     // For other transaction types, create normally
     const newTransaction = { ...transaction, id, timestamp: now };
     this.stockTransactions.set(id, newTransaction);
@@ -560,11 +559,11 @@ class MemStorage {
   async getExpiringBatches(daysAhead = 30) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() + daysAhead);
-    
+
     return Array.from(this.inventoryBatches.values())
-      .filter(batch => 
-        batch.remainingQuantity > 0 && 
-        batch.expiryDate && 
+      .filter(batch =>
+        batch.remainingQuantity > 0 &&
+        batch.expiryDate &&
         new Date(batch.expiryDate) <= cutoffDate
       )
       .sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate))
@@ -805,12 +804,12 @@ class DatabaseStorage {
   async getAllOrders() {
     try {
       const allOrders = await db.select().from(orders);
-      
+
       for (const order of allOrders) {
         const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
         order.orderItems = items;
       }
-      
+
       return allOrders;
     } catch (error) {
       console.error("Error getting all orders:", error);
@@ -832,10 +831,10 @@ class DatabaseStorage {
     try {
       const result = await db.insert(orders).values(order).returning();
       const newOrder = result[0];
-      
+
       const orderItemsData = items.map(item => ({ ...item, orderId: newOrder.id }));
       const createdItems = await db.insert(orderItems).values(orderItemsData).returning();
-      
+
       newOrder.orderItems = createdItems;
       return newOrder;
     } catch (error) {
@@ -867,9 +866,9 @@ class DatabaseStorage {
     try {
       const oneMonthFromNow = new Date();
       oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-      
+
       const allProducts = await db.select().from(products);
-      
+
       return allProducts
         .filter(product => {
           if (!product.shelfLife) return false;
@@ -902,7 +901,7 @@ class DatabaseStorage {
     try {
       const transactions = await db.select().from(stockTransactions).limit(5);
       const allProducts = await db.select().from(products);
-      
+
       return transactions.map(transaction => {
         const product = allProducts.find(p => p.id === transaction.productId);
         return {
