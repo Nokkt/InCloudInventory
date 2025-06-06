@@ -12,4 +12,4 @@ const Input = React.forwardRef(({ className, type, ...props }, ref) => {
   );
 });
 
-export default {Input};
+export default { Input };
