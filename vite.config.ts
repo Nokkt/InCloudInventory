@@ -1,3 +1,4 @@
+// vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -24,11 +25,11 @@ export default defineConfig({
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
- 
-build: {
-  outDir: path.resolve(import.meta.dirname, "dist", "public"), // This resolves to my-project/dist/public
-  emptyOutDir: true,
-  chunkSizeWarningLimit: 1000,
-
+  build: {
+    // *** CHANGE THIS LINE ***
+    // Output directly to a 'build' folder at the project root
+    outDir: path.resolve(import.meta.dirname, "build"), // This will be my-project/build/
+    emptyOutDir: true,
+    chunkSizeWarningLimit: 1000,
   },
 });
