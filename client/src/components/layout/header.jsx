@@ -16,12 +16,13 @@ import {
 
 
 
-export function Header({ 
+export function Header(
+  { 
   title, 
   description, 
   showSearch = true,
   onSearch
-}= useAuth();
+   }= useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (e: React.ChangeEvent) => {
