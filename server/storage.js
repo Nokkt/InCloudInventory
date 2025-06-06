@@ -254,10 +254,7 @@ class MemStorage {
     return this.stockTransactions.get(id);
   }
 
-    this.stockTransactions.set(id, newTransaction);
-    return newTransaction;
-  }
-
+    
   async updateStockTransaction(id, update) {
     const transaction = this.stockTransactions.get(id);
     if (!transaction) return undefined;
