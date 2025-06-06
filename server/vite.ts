@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
+import viteConfig from "../vite.config"; // Path to your vite.config.ts from server/
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
@@ -47,7 +47,7 @@ export async function setupVite(app: Express, server: Server) {
     try {
       const clientTemplate = path.resolve(
         import.meta.dirname,
-        "..",
+        "..", // Go up one level from 'server' to 'my-project' root
         "client",
         "index.html",
       );
@@ -67,8 +67,12 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
+// --- IMPORTANT CHANGE HERE ---
+// This function needs to be in `server/vite.ts` as it's imported by your main server file
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // Corrected path: From 'server/' directory, go up one (..) to 'my-project/' root,
+  // then into the new 'build' directory.
+  const distPath = path.resolve(import.meta.dirname, "..", "build");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
